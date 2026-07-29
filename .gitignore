@@ -145,10 +145,6 @@ vite.config.ts.timestamp-*
 # Electron (electron-vite) build output
 out/
 
-# Capacitor native projects
-android/
-ios/
-
 # Build output (web/Capacitor)
 dist/
 
