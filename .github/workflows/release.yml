@@ -10,9 +10,15 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
-        with: { node-version: '22', cache: 'npm' }
+        with: { node-version: '22', cache: '' }
 
-      - run: npm ci
+      - name: Fail fast if lockfile pins a private/LAN registry
+        run: |
+          if grep -qE '"resolved": "https?://(10\.|192\.168\.|172\.(1[6-9]|2[0-9]|3[01])\.)' package-lock.json; then
+            echo "::error::package-lock.json pins a private/LAN registry (e.g. 10.x.x.x). Regenerate it against the public registry and commit: npm install --registry=https://registry.npmjs.org/"
+            exit 1
+          fi
+      - run: npm ci --ignore-scripts --no-audit --no-fund
       - run: npm run build:desktop
 
       # macOS: universal (arm64 + x64) DMG + ZIP
@@ -36,8 +42,14 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
-        with: { node-version: '22', cache: 'npm' }
-      - run: npm ci
+        with: { node-version: '22', cache: '' }
+      - name: Fail fast if lockfile pins a private/LAN registry
+        run: |
+          if grep -qE '"resolved": "https?://(10\.|192\.168\.|172\.(1[6-9]|2[0-9]|3[01])\.)' package-lock.json; then
+            echo "::error::package-lock.json pins a private/LAN registry (e.g. 10.x.x.x). Regenerate it against the public registry and commit: npm install --registry=https://registry.npmjs.org/"
+            exit 1
+          fi
+      - run: npm ci --ignore-scripts --no-audit --no-fund
       - run: npm run build:desktop
       - run: npx electron-builder --win --x64 --publish never
         env:
@@ -53,8 +65,14 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
-        with: { node-version: '22', cache: 'npm' }
-      - run: npm ci
+        with: { node-version: '22', cache: '' }
+      - name: Fail fast if lockfile pins a private/LAN registry
+        run: |
+          if grep -qE '"resolved": "https?://(10\.|192\.168\.|172\.(1[6-9]|2[0-9]|3[01])\.)' package-lock.json; then
+            echo "::error::package-lock.json pins a private/LAN registry (e.g. 10.x.x.x). Regenerate it against the public registry and commit: npm install --registry=https://registry.npmjs.org/"
+            exit 1
+          fi
+      - run: npm ci --ignore-scripts --no-audit --no-fund
       - run: npm run build
       - run: npx cap sync android
 
