@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useEditorStore } from '@/state/editorStore';
+import { useT } from '@/i18n';
 import { exportDocument } from '@/export/ExportService';
 import type { LoadedImages } from '@/export/render';
 import { getLoadedImagesBySrc } from '@/lib/imageCache';
@@ -16,6 +17,7 @@ export function ExportDialog({ open, onClose }: Props) {
   const [dpi, setDpi] = useState(doc.canvas.dpi);
   const [colorMode, setColorMode] = useState<'cmyk' | 'rgb'>('cmyk');
   const [busy, setBusy] = useState(false);
+  const { t } = useT();
 
   if (!open) return null;
 
@@ -37,7 +39,7 @@ export function ExportDialog({ open, onClose }: Props) {
       await saveBytes(name, result.bytes, result.mime);
       onClose();
     } catch (e) {
-      alert(`Export failed: ${(e as Error).message}`);
+      alert(t('export.failed', { msg: (e as Error).message }));
     } finally {
       setBusy(false);
     }
@@ -46,18 +48,18 @@ export function ExportDialog({ open, onClose }: Props) {
   return (
     <div className="modal-overlay" onClick={onClose}>
       <div className="modal" onClick={(e) => e.stopPropagation()}>
-        <h2>Export</h2>
+        <h2>{t('export.title')}</h2>
 
         <label>
-          Color mode
+          {t('export.colorMode')}
           <select value={colorMode} onChange={(e) => setColorMode(e.target.value as 'cmyk' | 'rgb')}>
-            <option value="cmyk">CMYK (print, TIFF)</option>
-            <option value="rgb">RGB (PNG)</option>
+            <option value="cmyk">{t('export.cmyk')}</option>
+            <option value="rgb">{t('export.rgb')}</option>
           </select>
         </label>
 
         <label>
-          Resolution (DPI)
+          {t('export.resolution')}
           <input
             type="number"
             min={72}
@@ -68,23 +70,21 @@ export function ExportDialog({ open, onClose }: Props) {
         </label>
 
         <p className="muted">
-          Output: <strong>
-            {size.w} × {size.h}px
-          </strong> (incl. {doc.canvas.bleedMM} mm bleed)
+          {t('export.output')} <strong>{size.w} × {size.h}px</strong> ({t('export.inclBleed', { bleed: doc.canvas.bleedMM })})
           {colorMode === 'cmyk' && (
             <>
               <br />
-              <small>CMYK separation via matrix/UCR (offline). ICC-managed lcms-wasm is the documented upgrade path.</small>
+              <small>{t('export.cmykNote')}</small>
             </>
           )}
         </p>
 
         <div className="modal-actions">
           <button onClick={onClose} disabled={busy}>
-            Cancel
+            {t('common.cancel')}
           </button>
           <button className="primary" onClick={run} disabled={busy}>
-            {busy ? 'Exporting…' : 'Export'}
+            {busy ? t('export.exporting') : t('export.title')}
           </button>
         </div>
       </div>

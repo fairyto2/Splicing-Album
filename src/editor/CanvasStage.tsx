@@ -3,6 +3,7 @@ import type { DragEvent as ReactDragEvent } from 'react';
 import { Group, Layer as KLayer, Rect, Stage, Transformer } from 'react-konva';
 import type Konva from 'konva';
 import { useEditorStore } from '@/state/editorStore';
+import { useT } from '@/i18n';
 import type { Rect as RectT } from '@/data/types';
 import { canvasDesignSize, mmToPx, zoomPlacement } from '@/data/geometry';
 import { PhotoLayer } from './PhotoLayer';
@@ -18,6 +19,7 @@ export function CanvasStage() {
   const selectLayer = useEditorStore((s) => s.selectLayer);
   const setLayerPlacement = useEditorStore((s) => s.setLayerPlacement);
   const fillSlot = useEditorStore((s) => s.fillSlot);
+  const { t } = useT();
 
   const containerRef = useRef<HTMLDivElement>(null);
   const stageRef = useRef<Konva.Stage>(null);
@@ -135,14 +137,14 @@ export function CanvasStage() {
       onDrop={handleDrop}
     >
       <div className="zoom-controls">
-        <button onClick={() => setZoom((z) => Math.max(0.05, z * 0.8))} aria-label="Zoom out">
+        <button onClick={() => setZoom((z) => Math.max(0.05, z * 0.8))} aria-label={t('canvas.zoomOut')}>
           −
         </button>
         <span>{Math.round(zoom * 100)}%</span>
-        <button onClick={() => setZoom((z) => Math.min(8, z * 1.25))} aria-label="Zoom in">
+        <button onClick={() => setZoom((z) => Math.min(8, z * 1.25))} aria-label={t('canvas.zoomIn')}>
           +
         </button>
-        {doc.frameLocked && <span className="badge">Frames locked</span>}
+        {doc.frameLocked && <span className="badge">{t('canvas.framesLocked')}</span>}
       </div>
 
       {vp.w > 0 && vp.h > 0 && (

@@ -1,4 +1,5 @@
 import { useEditorStore } from '@/state/editorStore';
+import { useT } from '@/i18n';
 
 export function LayerPanel() {
   const doc = useEditorStore((s) => s.document);
@@ -8,15 +9,16 @@ export function LayerPanel() {
   const moveLayerZ = useEditorStore((s) => s.moveLayerZ);
   const setLayerOpacity = useEditorStore((s) => s.setLayerOpacity);
   const setLayerFit = useEditorStore((s) => s.setLayerFit);
+  const { t } = useT();
 
   const layersTopFirst = [...doc.layers].sort((a, b) => b.zIndex - a.zIndex);
   const selected = doc.layers.find((l) => l.id === selectedLayerId);
 
   return (
     <aside className="layers">
-      <h2>Layers</h2>
+      <h2>{t('layers.title')}</h2>
 
-      {layersTopFirst.length === 0 && <p className="muted">No layers yet. Add a photo.</p>}
+      {layersTopFirst.length === 0 && <p className="muted">{t('layers.empty')}</p>}
 
       <ul className="layer-list">
         {layersTopFirst.map((layer) => (
@@ -28,7 +30,7 @@ export function LayerPanel() {
             <span className="layer-name">{layer.name || 'Untitled'}</span>
             <span className="layer-actions">
               <button
-                title="Bring forward"
+                title={t('layers.bringForward')}
                 onClick={(e) => {
                   e.stopPropagation();
                   moveLayerZ(layer.id, 'up');
@@ -37,7 +39,7 @@ export function LayerPanel() {
                 ↑
               </button>
               <button
-                title="Send backward"
+                title={t('layers.sendBackward')}
                 onClick={(e) => {
                   e.stopPropagation();
                   moveLayerZ(layer.id, 'down');
@@ -46,7 +48,7 @@ export function LayerPanel() {
                 ↓
               </button>
               <button
-                title="Delete"
+                title={t('common.delete')}
                 onClick={(e) => {
                   e.stopPropagation();
                   removeLayer(layer.id);
@@ -63,7 +65,7 @@ export function LayerPanel() {
         <div className="layer-props">
           <h3>{selected.name}</h3>
           <label>
-            Opacity
+            {t('layers.opacity')}
             <input
               type="range"
               min={0}
@@ -75,18 +77,16 @@ export function LayerPanel() {
             <span>{Math.round(selected.opacity * 100)}%</span>
           </label>
           <label>
-            Fit
+            {t('layers.fit')}
             <select
               value={selected.fit}
               onChange={(e) => setLayerFit(selected.id, e.target.value as 'cover' | 'contain')}
             >
-              <option value="cover">Cover</option>
-              <option value="contain">Contain</option>
+              <option value="cover">{t('layers.fitCover')}</option>
+              <option value="contain">{t('layers.fitContain')}</option>
             </select>
           </label>
-          {selected.imageSrc === '' && (
-            <p className="hint">Empty slot — select it, then “Add Photo” to fill.</p>
-          )}
+          {selected.imageSrc === '' && <p className="hint">{t('layers.emptySlotHint')}</p>}
         </div>
       )}
     </aside>

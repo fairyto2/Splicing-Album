@@ -1,5 +1,7 @@
 import { useRef, useState } from 'react';
 import { useEditorStore, undo, redo, useHistory } from '@/state/editorStore';
+import { useT } from '@/i18n';
+import type { Lang } from '@/i18n';
 import { builtInTemplates, parseTemplate, serializeTemplate, templateFromDocument } from '@/data/template';
 import { parseDocument, serializeDocument } from '@/data/document';
 import { openJsonText, saveBytes } from '@/platform';
@@ -19,6 +21,7 @@ export function Toolbar() {
   const addSlot = useEditorStore((s) => s.addSlot);
   const userTemplates = useEditorStore((s) => s.userTemplates);
   const { canUndo, canRedo } = useHistory();
+  const { t, lang, setLang } = useT();
 
   const [showExport, setShowExport] = useState(false);
   const [showSaveTpl, setShowSaveTpl] = useState(false);
@@ -35,7 +38,7 @@ export function Toolbar() {
   };
 
   const exportTemplate = async () => {
-    const tpl = templateFromDocument(doc, 'My Template');
+    const tpl = templateFromDocument(doc, t('saveTpl.placeholder'));
     await saveBytes(
       'template.json',
       new TextEncoder().encode(serializeTemplate(tpl)),
@@ -49,7 +52,7 @@ export function Toolbar() {
     try {
       applyTemplate(parseTemplate(text));
     } catch (e) {
-      alert(`Invalid template: ${(e as Error).message}`);
+      alert(t('alert.invalidTemplate', { msg: (e as Error).message }));
     }
   };
 
@@ -67,17 +70,17 @@ export function Toolbar() {
     try {
       loadDocument(parseDocument(text));
     } catch (e) {
-      alert(`Invalid document: ${(e as Error).message}`);
+      alert(t('alert.invalidDocument', { msg: (e as Error).message }));
     }
   };
 
   return (
     <header className="toolbar">
-      <div className="brand">Splicing Album</div>
+      <div className="brand">{t('brand')}</div>
 
       <div className="group">
         <button className="primary" onClick={() => photoInput.current?.click()}>
-          + Add Photo
+          {t('toolbar.addPhoto')}
         </button>
         <input
           ref={photoInput}
@@ -93,56 +96,56 @@ export function Toolbar() {
       </div>
 
       <div className="group">
-        <span className="label">Template</span>
-        <button onClick={newTemplate} title="Start a blank layout to design a new template">
-          New
+        <span className="label">{t('toolbar.template')}</span>
+        <button onClick={newTemplate} title={t('toolbar.new')}>
+          {t('toolbar.new')}
         </button>
-        <button onClick={addSlot} title="Add an empty, resizable frame (slot)">
-          + Slot
+        <button onClick={addSlot} title={t('toolbar.addSlot')}>
+          {t('toolbar.addSlot')}
         </button>
         <select
           defaultValue=""
           onChange={(e) => {
             const tpl = [...builtInTemplates(), ...userTemplates].find(
-              (t) => t.name === e.target.value,
+              (tm) => tm.name === e.target.value,
             );
             if (tpl) applyTemplate(tpl);
             e.target.value = '';
           }}
         >
           <option value="" disabled>
-            Apply…
+            {t('toolbar.apply')}
           </option>
-          <optgroup label="Built-in">
-            {builtInTemplates().map((t) => (
-              <option key={t.name} value={t.name}>
-                {t.name}
+          <optgroup label={t('toolbar.optBuiltIn')}>
+            {builtInTemplates().map((tm) => (
+              <option key={tm.name} value={tm.name}>
+                {tm.name}
               </option>
             ))}
           </optgroup>
           {userTemplates.length > 0 && (
-            <optgroup label="My templates">
-              {userTemplates.map((t) => (
-                <option key={t.name} value={t.name}>
-                  {t.name}
+            <optgroup label={t('toolbar.optMine')}>
+              {userTemplates.map((tm) => (
+                <option key={tm.name} value={tm.name}>
+                  {tm.name}
                 </option>
               ))}
             </optgroup>
           )}
         </select>
-        <button onClick={() => setShowSaveTpl(true)} title="Save current layout as a template">
-          Save
+        <button onClick={() => setShowSaveTpl(true)} title={t('toolbar.saveTitle')}>
+          {t('toolbar.save')}
         </button>
-        <button onClick={importTemplate} title="Import template JSON">
-          Import
+        <button onClick={importTemplate} title={t('toolbar.import')}>
+          {t('toolbar.import')}
         </button>
-        <button onClick={exportTemplate} title="Export current layout as template JSON">
-          Export
+        <button onClick={exportTemplate} title={t('toolbar.exportTpl')}>
+          {t('toolbar.exportTpl')}
         </button>
       </div>
 
       <div className="group">
-        <span className="label">Canvas (mm / dpi)</span>
+        <span className="label">{t('toolbar.canvas')}</span>
         <input
           className="num"
           type="number"
@@ -166,30 +169,30 @@ export function Toolbar() {
           className="num"
           type="number"
           value={doc.canvas.bleedMM}
-          title="Bleed (mm)"
+          title={t('toolbar.bleed')}
           onChange={(e) => setCanvas({ bleedMM: Number(e.target.value) })}
         />
         <button
           className={frameLocked ? 'primary' : ''}
-          title="Lock frame positions (template mode)"
+          title={frameLocked ? t('toolbar.framesLocked') : t('toolbar.lockFrames')}
           onClick={() => setFrameLocked(!frameLocked)}
         >
-          {frameLocked ? '🔒 Frames locked' : '🔓 Lock frames'}
+          {frameLocked ? t('toolbar.framesLocked') : t('toolbar.lockFrames')}
         </button>
       </div>
 
       <div className="group">
-        <button onClick={undo} disabled={!canUndo} title="Undo">
+        <button onClick={undo} disabled={!canUndo} title={t('toolbar.undo')}>
           ↶
         </button>
-        <button onClick={redo} disabled={!canRedo} title="Redo">
+        <button onClick={redo} disabled={!canRedo} title={t('toolbar.redo')}>
           ↷
         </button>
-        <button onClick={saveDoc} title="Save document (album.json)">
-          Save Doc
+        <button onClick={saveDoc} title={t('toolbar.saveDoc')}>
+          {t('toolbar.saveDoc')}
         </button>
-        <button onClick={() => docInput.current?.click()} title="Open document">
-          Open
+        <button onClick={() => docInput.current?.click()} title={t('toolbar.open')}>
+          {t('toolbar.open')}
         </button>
         <input
           ref={docInput}
@@ -202,7 +205,7 @@ export function Toolbar() {
               try {
                 loadDocument(parseDocument(await f.text()));
               } catch (err) {
-                alert(`Invalid document: ${(err as Error).message}`);
+                alert(t('alert.invalidDocument', { msg: (err as Error).message }));
               }
             }
             e.target.value = '';
@@ -211,8 +214,16 @@ export function Toolbar() {
       </div>
 
       <div className="group right">
+        <select
+          value={lang}
+          title={t('toolbar.language')}
+          onChange={(e) => setLang(e.target.value as Lang)}
+        >
+          <option value="en">EN</option>
+          <option value="zh">中文</option>
+        </select>
         <button className="primary" onClick={() => setShowExport(true)}>
-          Export…
+          {t('toolbar.export')}
         </button>
       </div>
 
