@@ -10,6 +10,8 @@
     "build": "vite build",
     "build:desktop": "electron-vite build",
     "package:mac": "electron-vite build && electron-builder --mac",
+    "package:win": "electron-vite build && electron-builder --win",
+    "package:linux": "electron-vite build && electron-builder --linux",
     "preview": "vite preview",
     "cap:sync": "npm run build && cap sync",
     "cap:add:ios": "cap add ios",
@@ -61,8 +63,22 @@
     },
     "files": ["out/**/*", "package.json"],
     "mac": {
-      "target": ["dir"],
-      "category": "public.app-category.photography"
+      "target": ["dmg", "zip"],
+      "category": "public.app-category.photography",
+      "artifactName": "${productName}-${version}-mac-${arch}.${ext}"
+    },
+    "win": {
+      "target": ["nsis"],
+      "artifactName": "${productName}-${version}-win-${arch}.${ext}"
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true
+    },
+    "linux": {
+      "target": ["AppImage"],
+      "category": "Graphics",
+      "artifactName": "${productName}-${version}-linux-${arch}.${ext}"
     }
   }
 }

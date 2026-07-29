@@ -1,0 +1,100 @@
+name: Release
+
+on:
+  push:
+    tags: ['v*']
+
+jobs:
+  desktop-mac-linux:
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: '22', cache: 'npm' }
+
+      - run: npm ci
+      - run: npm run build:desktop
+
+      # macOS: universal (arm64 + x64) DMG + ZIP
+      - run: npx electron-builder --mac --arm64 --x64 --publish never
+        env:
+          ELECTRON_MIRROR: ${{ vars.ELECTRON_MIRROR || '' }}
+
+      # Linux (cross-build from macOS): x64 AppImage
+      - run: npx electron-builder --linux --x64 --publish never
+        env:
+          ELECTRON_MIRROR: ${{ vars.ELECTRON_MIRROR || '' }}
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: desktop-mac-linux
+          path: release/*.{dmg,zip,AppImage}
+          if-no-files-found: error
+
+  desktop-win:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: '22', cache: 'npm' }
+      - run: npm ci
+      - run: npm run build:desktop
+      - run: npx electron-builder --win --x64 --publish never
+        env:
+          ELECTRON_MIRROR: ${{ vars.ELECTRON_MIRROR || '' }}
+      - uses: actions/upload-artifact@v4
+        with:
+          name: desktop-win
+          path: release/*.exe
+          if-no-files-found: error
+
+  android:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: '22', cache: 'npm' }
+      - run: npm ci
+      - run: npm run build
+      - run: npx cap sync android
+
+      - uses: actions/setup-java@v4
+        with: { java-version: '21', distribution: 'temurin' }
+
+      - uses: android-actions/setup-android@v3
+        with:
+          api-level: 36
+          build-tools-version: '36.0.0'
+
+      - uses: gradle/actions/setup-gradle@v4
+        with:
+          build-scan-publish: false
+
+      - run: cd android && ./gradlew :app:assembleDebug
+
+      - name: Copy APK for release
+        run: |
+          mkdir -p release
+          APK="android/app/build/outputs/apk/debug/app-debug.apk"
+          cp "$APK" "release/Splicing-Album-${{ github.ref_name }}-android.apk"
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: android
+          path: release/Splicing-Album-*-android.apk
+          if-no-files-found: error
+
+  publish:
+    needs: [desktop-mac-linux, desktop-win, android]
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/download-artifact@v4
+        with: { pattern: '*', merge-multiple: false }
+
+      - name: Publish GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          draft: true
+          files: desktop-mac-linux/* desktop-win/* android/*
