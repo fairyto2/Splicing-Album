@@ -1,0 +1,68 @@
+{
+  "name": "splicing-album",
+  "private": true,
+  "version": "0.1.0",
+  "description": "Import photos, arrange them freely on a masked multi-layer canvas, and export high-resolution CMYK print-ready images. Desktop (Electron) + mobile (Capacitor), one React core.",
+  "main": "./out/main/index.js",
+  "scripts": {
+    "dev": "electron-vite dev",
+    "dev:web": "vite",
+    "build": "vite build",
+    "build:desktop": "electron-vite build",
+    "package:mac": "electron-vite build && electron-builder --mac",
+    "preview": "vite preview",
+    "cap:sync": "npm run build && cap sync",
+    "cap:add:ios": "cap add ios",
+    "cap:add:android": "cap add android",
+    "typecheck": "tsc --noEmit",
+    "lint": "eslint .",
+    "format": "prettier --write .",
+    "test": "vitest",
+    "test:run": "vitest run"
+  },
+  "dependencies": {
+    "konva": "^10.3.0",
+    "react": "^19.2.8",
+    "react-dom": "^19.2.8",
+    "react-konva": "^19.2.5",
+    "uuid": "^14.0.1",
+    "zundo": "^2.3.0",
+    "zustand": "^5.0.14"
+  },
+  "devDependencies": {
+    "@capacitor/android": "^8.4.2",
+    "@capacitor/cli": "^8.4.2",
+    "@capacitor/core": "^8.4.2",
+    "@capacitor/filesystem": "^8.1.2",
+    "@capacitor/ios": "^8.4.2",
+    "@capacitor/share": "^8.0.1",
+    "@testing-library/jest-dom": "^7.0.0",
+    "@testing-library/react": "^16.3.2",
+    "@types/node": "^26.1.2",
+    "@types/react": "^19.2.17",
+    "@types/react-dom": "^19.2.3",
+    "@types/uuid": "^11.0.0",
+    "@vitejs/plugin-react": "^5.2.0",
+    "electron": "^43.2.0",
+    "electron-builder": "^26.15.3",
+    "electron-vite": "^5.0.0",
+    "jsdom": "^30.0.0",
+    "prettier": "^3.9.6",
+    "typescript": "^7.0.2",
+    "vite": "^7.3.6",
+    "vitest": "^3.2.7"
+  },
+  "build": {
+    "appId": "com.splicyalbum.app",
+    "productName": "Splicing Album",
+    "directories": {
+      "output": "release",
+      "buildResources": "build"
+    },
+    "files": ["out/**/*", "package.json"],
+    "mac": {
+      "target": ["dir"],
+      "category": "public.app-category.photography"
+    }
+  }
+}

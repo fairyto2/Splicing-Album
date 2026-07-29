@@ -141,3 +141,19 @@ dist
 vite.config.js.timestamp-*
 vite.config.ts.timestamp-*
 .vite/
+
+# Electron (electron-vite) build output
+out/
+
+# Capacitor native projects
+android/
+ios/
+
+# Build output (web/Capacitor)
+dist/
+
+# electron-builder packaging output
+release/
+
+# Generated sample images (regenerate with: node samples/gen.js)
+samples/*.png
