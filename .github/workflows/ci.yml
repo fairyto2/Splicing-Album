@@ -14,6 +14,8 @@ jobs:
       - uses: actions/setup-node@v4
         with: { node-version: '22', cache: '' }
       - run: npm install --prefer-offline --no-audit --no-fund
+        env:
+          ELECTRON_SKIP_BINARY_DOWNLOAD: '1'
       - run: npm run typecheck
 
   test:
@@ -23,6 +25,8 @@ jobs:
       - uses: actions/setup-node@v4
         with: { node-version: '22', cache: '' }
       - run: npm install --prefer-offline --no-audit --no-fund
+        env:
+          ELECTRON_SKIP_BINARY_DOWNLOAD: '1'
       - run: npm run test:run
 
   build-web:
@@ -32,6 +36,8 @@ jobs:
       - uses: actions/setup-node@v4
         with: { node-version: '22', cache: '' }
       - run: npm install --prefer-offline --no-audit --no-fund
+        env:
+          ELECTRON_SKIP_BINARY_DOWNLOAD: '1'
       - run: npm run build
 
   build-desktop:
@@ -41,6 +47,8 @@ jobs:
       - uses: actions/setup-node@v4
         with: { node-version: '22', cache: '' }
       - run: npm install --prefer-offline --no-audit --no-fund
+        env:
+          ELECTRON_SKIP_BINARY_DOWNLOAD: '1'
       - run: npm run build:desktop
 
   build-android:
@@ -50,6 +58,8 @@ jobs:
       - uses: actions/setup-node@v4
         with: { node-version: '22', cache: '' }
       - run: npm install --prefer-offline --no-audit --no-fund
+        env:
+          ELECTRON_SKIP_BINARY_DOWNLOAD: '1'
       - run: npm run build
       - run: npx cap sync android
 
