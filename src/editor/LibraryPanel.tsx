@@ -1,6 +1,7 @@
 import { useRef } from 'react';
 import { v4 as uuid } from 'uuid';
 import { useEditorStore } from '@/state/editorStore';
+import { useT } from '@/i18n';
 import { fileToImageInfo } from './imageUtils';
 
 /**
@@ -14,6 +15,7 @@ export function LibraryPanel() {
   const removeFromLibrary = useEditorStore((s) => s.removeFromLibrary);
   const clearLibrary = useEditorStore((s) => s.clearLibrary);
   const inputRef = useRef<HTMLInputElement>(null);
+  const { t } = useT();
 
   const importFiles = async (files: FileList | null) => {
     if (!files) return;
@@ -29,14 +31,14 @@ export function LibraryPanel() {
   return (
     <aside className="library">
       <div className="library-head">
-        <h2>Library</h2>
-        <button onClick={() => clearLibrary()} disabled={!library.length} title="Clear library">
-          Clear
+        <h2>{t('library.title')}</h2>
+        <button onClick={() => clearLibrary()} disabled={!library.length} title={t('library.clearTitle')}>
+          {t('common.clear')}
         </button>
       </div>
 
       <button className="primary block" onClick={() => inputRef.current?.click()}>
-        + Import images
+        {t('library.import')}
       </button>
       <input
         ref={inputRef}
@@ -51,7 +53,7 @@ export function LibraryPanel() {
       />
 
       {library.length === 0 ? (
-        <p className="muted">Import images here, then drag a thumbnail onto a template slot.</p>
+        <p className="muted">{t('library.empty')}</p>
       ) : (
         <div className="library-grid">
           {library.map((item) => (
@@ -64,12 +66,12 @@ export function LibraryPanel() {
                 e.dataTransfer.setData('text/plain', item.id);
                 e.dataTransfer.effectAllowed = 'copy';
               }}
-              title={`${item.w}×${item.h} — drag to a slot`}
+              title={t('library.dragHint', { w: item.w, h: item.h })}
             >
               <img src={item.src} alt="" draggable={false} />
               <button
                 className="remove"
-                title="Remove from library"
+                title={t('library.remove')}
                 onClick={() => removeFromLibrary(item.id)}
               >
                 ✕

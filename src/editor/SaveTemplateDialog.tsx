@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useEditorStore } from '@/state/editorStore';
+import { useT } from '@/i18n';
 import { templateFromDocument } from '@/data/template';
 import { canvasDesignSize } from '@/data/geometry';
 
@@ -13,6 +14,7 @@ export function SaveTemplateDialog({ open, onClose }: Props) {
   const doc = useEditorStore((s) => s.document);
   const addUserTemplate = useEditorStore((s) => s.addUserTemplate);
   const [name, setName] = useState('');
+  const { t } = useT();
 
   useEffect(() => {
     if (open) setName('');
@@ -21,7 +23,7 @@ export function SaveTemplateDialog({ open, onClose }: Props) {
   if (!open) return null;
 
   const save = () => {
-    addUserTemplate(templateFromDocument(doc, name.trim() || 'My Template'));
+    addUserTemplate(templateFromDocument(doc, name.trim() || t('saveTpl.placeholder')));
     onClose();
   };
 
@@ -31,13 +33,13 @@ export function SaveTemplateDialog({ open, onClose }: Props) {
   return (
     <div className="modal-overlay" onClick={onClose}>
       <div className="modal" onClick={(e) => e.stopPropagation()}>
-        <h2>Save Template</h2>
+        <h2>{t('saveTpl.title')}</h2>
         <label>
-          Name
+          {t('saveTpl.name')}
           <input
             autoFocus
             value={name}
-            placeholder="My Template"
+            placeholder={t('saveTpl.placeholder')}
             onChange={(e) => setName(e.target.value)}
             onKeyDown={(e) => {
               if (e.key === 'Enter') save();
@@ -45,17 +47,24 @@ export function SaveTemplateDialog({ open, onClose }: Props) {
           />
         </label>
         <p className="muted">
-          {slotCount} slot(s) · {doc.canvas.widthMM}×{doc.canvas.heightMM}mm @ {doc.canvas.dpi} DPI ({w}×{h}px)
+          {t('saveTpl.summary', {
+            count: slotCount,
+            wmm: doc.canvas.widthMM,
+            hmm: doc.canvas.heightMM,
+            dpi: doc.canvas.dpi,
+            wpx: w,
+            hpx: h,
+          })}
           <br />
-          <small>Saved to this app and added to the Template list (persists across restarts).</small>
+          <small>{t('saveTpl.note')}</small>
         </p>
         <div className="modal-actions">
-          <button onClick={onClose}>Cancel</button>
+          <button onClick={onClose}>{t('common.cancel')}</button>
           <button className="primary" onClick={save} disabled={slotCount === 0}>
-            Save
+            {t('common.save')}
           </button>
         </div>
-        {slotCount === 0 && <p className="muted">Add at least one slot first.</p>}
+        {slotCount === 0 && <p className="muted">{t('saveTpl.addSlotFirst')}</p>}
       </div>
     </div>
   );
