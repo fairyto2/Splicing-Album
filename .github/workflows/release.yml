@@ -13,6 +13,7 @@ jobs:
         with: { node-version: '22', cache: '' }
 
       - name: Fail fast if lockfile pins a private/LAN registry
+        shell: bash
         run: |
           if grep -qE '"resolved": "https?://(10\.|192\.168\.|172\.(1[6-9]|2[0-9]|3[01])\.)' package-lock.json; then
             echo "::error::package-lock.json pins a private/LAN registry (e.g. 10.x.x.x). Regenerate it against the public registry and commit: npm install --registry=https://registry.npmjs.org/"
@@ -44,6 +45,7 @@ jobs:
       - uses: actions/setup-node@v4
         with: { node-version: '22', cache: '' }
       - name: Fail fast if lockfile pins a private/LAN registry
+        shell: bash
         run: |
           if grep -qE '"resolved": "https?://(10\.|192\.168\.|172\.(1[6-9]|2[0-9]|3[01])\.)' package-lock.json; then
             echo "::error::package-lock.json pins a private/LAN registry (e.g. 10.x.x.x). Regenerate it against the public registry and commit: npm install --registry=https://registry.npmjs.org/"
@@ -67,6 +69,7 @@ jobs:
       - uses: actions/setup-node@v4
         with: { node-version: '22', cache: '' }
       - name: Fail fast if lockfile pins a private/LAN registry
+        shell: bash
         run: |
           if grep -qE '"resolved": "https?://(10\.|192\.168\.|172\.(1[6-9]|2[0-9]|3[01])\.)' package-lock.json; then
             echo "::error::package-lock.json pins a private/LAN registry (e.g. 10.x.x.x). Regenerate it against the public registry and commit: npm install --registry=https://registry.npmjs.org/"
