@@ -35,7 +35,10 @@ jobs:
       - uses: actions/upload-artifact@v4
         with:
           name: desktop-mac-linux
-          path: release/*.{dmg,zip,AppImage}
+          path: |
+            release/*.dmg
+            release/*.zip
+            release/*.AppImage
           if-no-files-found: error
 
   desktop-win:
