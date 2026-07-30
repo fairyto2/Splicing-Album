@@ -9,6 +9,7 @@ export function LayerPanel() {
   const moveLayerZ = useEditorStore((s) => s.moveLayerZ);
   const setLayerOpacity = useEditorStore((s) => s.setLayerOpacity);
   const setLayerFit = useEditorStore((s) => s.setLayerFit);
+  const setLayerRotation = useEditorStore((s) => s.setLayerRotation);
   const { t } = useT();
 
   const layersTopFirst = [...doc.layers].sort((a, b) => b.zIndex - a.zIndex);
@@ -86,6 +87,29 @@ export function LayerPanel() {
               <option value="contain">{t('layers.fitContain')}</option>
             </select>
           </label>
+          <label>
+            {t('layers.rotation')}
+            <input
+              type="range"
+              min={-180}
+              max={180}
+              step={1}
+              value={selected.rotation}
+              onChange={(e) => setLayerRotation(selected.id, Number(e.target.value))}
+            />
+            <span>{Math.round(selected.rotation)}°</span>
+          </label>
+          <div className="rotate-buttons">
+            <button title={t('layers.rotateLeft')} onClick={() => setLayerRotation(selected.id, selected.rotation - 90)}>
+              ⟲ 90°
+            </button>
+            <button title={t('layers.resetRotation')} onClick={() => setLayerRotation(selected.id, 0)}>
+              {t('layers.resetRotation')}
+            </button>
+            <button title={t('layers.rotateRight')} onClick={() => setLayerRotation(selected.id, selected.rotation + 90)}>
+              ⟳ 90°
+            </button>
+          </div>
           {selected.imageSrc === '' && <p className="hint">{t('layers.emptySlotHint')}</p>}
         </div>
       )}

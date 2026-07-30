@@ -313,6 +313,17 @@ button.block {
   width: 100%;
 }
 
+.rotate-buttons {
+  display: flex;
+  gap: 4px;
+}
+
+.rotate-buttons button {
+  flex: 1;
+  padding: 3px 6px;
+  font-size: 12px;
+}
+
 .hint {
   font-size: 12px;
   color: var(--accent);

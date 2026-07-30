@@ -61,6 +61,10 @@ const en: Dict = {
   'layers.fit': 'Fit',
   'layers.fitCover': 'Cover',
   'layers.fitContain': 'Contain',
+  'layers.rotation': 'Rotation',
+  'layers.rotateLeft': 'Rotate −90°',
+  'layers.rotateRight': 'Rotate +90°',
+  'layers.resetRotation': 'Reset',
   'layers.emptySlotHint': 'Empty slot — select it, then “Add Photo” to fill.',
 
   'library.title': 'Library',
@@ -135,6 +139,10 @@ const zh: Dict = {
   'layers.fit': '适配',
   'layers.fitCover': '填充',
   'layers.fitContain': '适应',
+  'layers.rotation': '旋转',
+  'layers.rotateLeft': '逆时针 90°',
+  'layers.rotateRight': '顺时针 90°',
+  'layers.resetRotation': '复原',
   'layers.emptySlotHint': '空框位——选中后点“添加图片”填充。',
 
   'library.title': '图库',

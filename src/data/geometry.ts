@@ -117,6 +117,14 @@ export function clamp(n: number, min: number, max: number): number {
   return n < min ? min : n > max ? max : n;
 }
 
+/** Normalize degrees into the canonical range (-180, 180]. */
+export function normalizeAngle(deg: number): number {
+  let d = deg % 360;
+  if (d <= -180) d += 360;
+  if (d > 180) d -= 360;
+  return d;
+}
+
 /** Smallest scale at which the image covers the frame. */
 export function coverScale(imageW: number, imageH: number, frameW: number, frameH: number): number {
   if (imageW <= 0 || imageH <= 0) return 1;

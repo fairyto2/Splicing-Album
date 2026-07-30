@@ -476,6 +476,46 @@ describe('undo / redo', () => {
 });
 
 // ---------------------------------------------------------------------------
+// setLayerRotation
+// ---------------------------------------------------------------------------
+
+describe('setLayerRotation', () => {
+  it('sets and normalizes the rotation', () => {
+    useEditorStore.getState().addPhoto('data:rot', 100, 100);
+    const id = useEditorStore.getState().document.layers[0].id;
+    useEditorStore.getState().setLayerRotation(id, 45);
+    expect(useEditorStore.getState().document.layers[0].rotation).toBe(45);
+    // normalizes out-of-range input into (-180, 180]
+    useEditorStore.getState().setLayerRotation(id, 270);
+    expect(useEditorStore.getState().document.layers[0].rotation).toBe(-90);
+  });
+
+  it('works in locked (template) mode', () => {
+    useEditorStore.setState((s) => ({
+      document: { ...s.document, frameLocked: true, layers: [emptySlot('r', 0, 0, 50, 50)] },
+      selectedLayerId: 'r',
+    }));
+    useEditorStore.getState().setLayerRotation('r', 30);
+    expect(useEditorStore.getState().document.layers[0].rotation).toBe(30);
+  });
+
+  it('records one undo entry per change and undo restores it', () => {
+    useEditorStore.getState().addPhoto('data:rot2', 100, 100);
+    const id = useEditorStore.getState().document.layers[0].id;
+    expect(useEditorStore.getState().document.layers[0].rotation).toBe(0);
+    useEditorStore.getState().setLayerRotation(id, 20);
+    useEditorStore.getState().setLayerRotation(id, -20);
+    expect(useEditorStore.getState().document.layers[0].rotation).toBe(-20);
+    undo();
+    expect(useEditorStore.getState().document.layers[0].rotation).toBe(20);
+    undo();
+    expect(useEditorStore.getState().document.layers[0].rotation).toBe(0);
+    redo();
+    expect(useEditorStore.getState().document.layers[0].rotation).toBe(20);
+  });
+});
+
+// ---------------------------------------------------------------------------
 // helpers
 // ---------------------------------------------------------------------------
 

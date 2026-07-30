@@ -4,7 +4,7 @@ import { v4 as uuid } from 'uuid';
 import type { CanvasSpec, Document, Fit, ImagePlacement, Layer, LibraryImage, Rect, Template } from '@/data/types';
 import { DOCUMENT_VERSION } from '@/data/types';
 import { createDocument, maxZIndex } from '@/data/document';
-import { canvasDesignSize, clampFrameToCanvas, clampPlacement, defaultFrameForAspect, fitPlacement } from '@/data/geometry';
+import { canvasDesignSize, clampFrameToCanvas, clampPlacement, defaultFrameForAspect, fitPlacement, normalizeAngle } from '@/data/geometry';
 
 export interface EditorState {
   /** The document under edit. This is the only slice tracked by undo/redo. */
@@ -25,6 +25,8 @@ export interface EditorState {
   moveLayerZ(id: string, dir: 'up' | 'down'): void;
   setLayerOpacity(id: string, opacity: number): void;
   setLayerFit(id: string, fit: Fit): void;
+  /** Rotate a layer around its frame centre. Degrees, normalized to (-180, 180]. */
+  setLayerRotation(id: string, degrees: number): void;
   setCanvas(patch: Partial<CanvasSpec>): void;
   setFrameLocked(locked: boolean): void;
   applyTemplate(template: Template): void;
@@ -201,6 +203,14 @@ export const useEditorStore = create<EditorState>()(
 
       setLayerOpacity: (id, opacity) =>
         set((s) => ({ document: { ...s.document, layers: mutateLayer(s.document.layers, id, (l) => ({ ...l, opacity })) } })),
+
+      setLayerRotation: (id, degrees) =>
+        set((s) => ({
+          document: {
+            ...s.document,
+            layers: mutateLayer(s.document.layers, id, (l) => ({ ...l, rotation: normalizeAngle(degrees) })),
+          },
+        })),
 
       setLayerFit: (id, fit) =>
         set((s) => ({

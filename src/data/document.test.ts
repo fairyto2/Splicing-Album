@@ -22,7 +22,7 @@ describe('serializeDocument / parseDocument', () => {
       imageW: 100,
       imageH: 50,
       frame: { x: 10, y: 10, w: 100, h: 50 },
-      rotation: 0,
+      rotation: 37,
       placement: { x: 0, y: 0, scale: 1 },
       opacity: 1,
       zIndex: 1,
