@@ -10,6 +10,7 @@ import {
   defaultFrameForAspect,
   fitPlacement,
   mmToPx,
+  normalizeAngle,
   rectClipFunc,
   zoomPlacement,
 } from './geometry';
@@ -204,5 +205,31 @@ describe('zoomPlacement', () => {
     const p: ImagePlacement = { x: 0, y: 0, scale: 0.15 };
     const z = zoomPlacement(p, 2000, 1000, { x: 0, y: 0, w: 100, h: 100 }, 0.1, 0, 0);
     expect(z.scale).toBeGreaterThanOrEqual(0.1);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// normalizeAngle
+// ---------------------------------------------------------------------------
+
+describe('normalizeAngle', () => {
+  it('leaves angles already in (-180, 180] unchanged', () => {
+    expect(normalizeAngle(0)).toBe(0);
+    expect(normalizeAngle(90)).toBe(90);
+    expect(normalizeAngle(-90)).toBe(-90);
+    expect(normalizeAngle(180)).toBe(180);
+  });
+
+  it('wraps angles outside the range', () => {
+    expect(normalizeAngle(270)).toBe(-90);
+    expect(normalizeAngle(-270)).toBe(90);
+    expect(normalizeAngle(360)).toBe(0);
+    expect(normalizeAngle(540)).toBe(180);
+    expect(normalizeAngle(720)).toBe(0);
+  });
+
+  it('canonicalizes -180 to 180', () => {
+    expect(normalizeAngle(-180)).toBe(180);
+    expect(normalizeAngle(-540)).toBe(180);
   });
 });

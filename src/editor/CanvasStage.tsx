@@ -4,12 +4,28 @@ import { Group, Layer as KLayer, Rect, Stage, Transformer } from 'react-konva';
 import type Konva from 'konva';
 import { useEditorStore } from '@/state/editorStore';
 import { useT } from '@/i18n';
-import type { Rect as RectT } from '@/data/types';
+import type { Layer as LayerT } from '@/data/types';
 import { canvasDesignSize, mmToPx, zoomPlacement } from '@/data/geometry';
 import { PhotoLayer } from './PhotoLayer';
 
-function pointInFrame(x: number, y: number, frame: RectT): boolean {
-  return x >= frame.x && x <= frame.x + frame.w && y >= frame.y && y <= frame.y + frame.h;
+/** Transform a canvas-space point into a layer's unrotated frame-local space. */
+function toFrameLocal(x: number, y: number, layer: LayerT): { x: number; y: number } {
+  const f = layer.frame;
+  const cx = f.x + f.w / 2;
+  const cy = f.y + f.h / 2;
+  const a = (-layer.rotation * Math.PI) / 180;
+  const cos = Math.cos(a);
+  const sin = Math.sin(a);
+  const dx = x - cx;
+  const dy = y - cy;
+  return { x: cx + dx * cos - dy * sin, y: cy + dx * sin + dy * cos };
+}
+
+/** Hit-test a canvas-space point against a layer's (possibly rotated) frame. */
+function pointInLayerFrame(x: number, y: number, layer: LayerT): boolean {
+  const f = layer.frame;
+  const p = toFrameLocal(x, y, layer);
+  return p.x >= f.x && p.x <= f.x + f.w && p.y >= f.y && p.y <= f.y + f.h;
 }
 
 export function CanvasStage() {
@@ -81,17 +97,20 @@ export function CanvasStage() {
     const dy = (pointer.y - offsetY) / zoom;
     const top = [...doc.layers]
       .sort((a, b) => b.zIndex - a.zIndex)
-      .find((l) => l.imageW > 0 && pointInFrame(dx, dy, l.frame));
+      .find((l) => l.imageW > 0 && pointInLayerFrame(dx, dy, l));
     if (!top) return;
     const factor = e.evt.deltaY < 0 ? 1.1 : 1 / 1.1;
+    // Anchor in the layer's unrotated frame-local space so the zoom stays under
+    // the cursor even when the layer is rotated.
+    const local = toFrameLocal(dx, dy, top);
     const np = zoomPlacement(
       top.placement,
       top.imageW,
       top.imageH,
       top.frame,
       factor,
-      dx - top.frame.x,
-      dy - top.frame.y,
+      local.x - top.frame.x,
+      local.y - top.frame.y,
     );
     setLayerPlacement(top.id, np);
   };
@@ -110,7 +129,7 @@ export function CanvasStage() {
     const dy = (e.clientY - rect.top - offsetY) / zoom;
     const slot = [...doc.layers]
       .sort((a, b) => b.zIndex - a.zIndex)
-      .find((l) => pointInFrame(dx, dy, l.frame));
+      .find((l) => pointInLayerFrame(dx, dy, l));
     if (!slot) return;
     fillSlot(slot.id, item.src, item.w, item.h);
     selectLayer(slot.id);
