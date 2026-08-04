@@ -383,17 +383,54 @@ button.block {
 
 /* ---------- Mobile layout (portrait / narrow) ---------- */
 
-/* Toolbar stays on one scrollable row instead of wrapping and eating height. */
-.app.mobile .toolbar {
+/* Compact mobile toolbar: a short bar of primary actions + a "More" sheet. */
+.mobile-toolbar {
+  position: relative;
   flex-wrap: nowrap;
-  overflow-x: auto;
-  overflow-y: hidden;
-  gap: 12px;
-  -webkit-overflow-scrolling: touch;
-  scrollbar-width: none;
+  gap: 8px;
+  padding: 8px 10px;
 }
-.app.mobile .toolbar::-webkit-scrollbar {
-  display: none;
+.mobile-bar {
+  position: relative;
+  z-index: 82;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+}
+.mobile-bar .brand {
+  font-size: 13px;
+}
+/* Tap-outside catcher so the More sheet closes; dims the canvas lightly. */
+.more-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 70;
+  background: rgba(0, 0, 0, 0.25);
+}
+/* Stacked secondary controls; each group's label sits on its own line. */
+.more-sheet {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  z-index: 80;
+  background: var(--panel);
+  border-bottom: 1px solid var(--border);
+  padding: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  max-height: 70vh;
+  overflow-y: auto;
+}
+.more-sheet .group {
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+}
+.more-sheet .label {
+  flex: 1 0 100%;
 }
 
 /* Canvas fills; the bottom tabs sit in the column flow below it. */
